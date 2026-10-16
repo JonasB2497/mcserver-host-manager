@@ -1,0 +1,37 @@
+blueprint:
+  name: Minecraft Server Starter Webhook
+  description: Toggle a switch based on POST data from Minecraft Server Starter
+  domain: automation
+  input:
+    webhook_id:
+      name: Webhook ID
+      description: The unique ID for the webhook trigger
+    target_switch:
+      name: Target Switch
+      description: The switch entity to toggle
+      selector:
+        entity:
+          domain: switch
+
+mode: parallel
+
+trigger:
+  - platform: webhook
+    webhook_id: !input webhook_id
+
+action:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.json.status == 'on' }}"
+        sequence:
+          - service: switch.turn_on
+            target:
+              entity_id: !input target_switch
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.json.status == 'off' }}"
+        sequence:
+          - service: switch.turn_off
+            target:
+              entity_id: !input target_switch
