@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from flask import Blueprint, jsonify, request
 
 from config_utils import ServerStatus
@@ -52,11 +54,15 @@ def scale():
 
         if target and target.status != ServerStatus.ONLINE.value:
             target.status = ServerStatus.ONLINE.value
+            target.updated_at = datetime.now(timezone.utc)
             db.session.commit()
 
         if not is_online:
             device = create_device(device_cfg)
-            device.up()
+            if not device.up():
+                return jsonify(
+                    {"status": "error", "message": "Failed to power up device"}
+                ), 500
 
         return jsonify(
             {"status": "success", "device": device_name, "action": "up"}
@@ -80,14 +86,32 @@ def scale():
 
         if target and target.status != ServerStatus.OFFLINE.value:
             target.status = ServerStatus.OFFLINE.value
+            target.updated_at = datetime.now(timezone.utc)
             db.session.commit()
 
         if was_last_online:
             device = create_device(device_cfg)
-            device.down()
+            if not device.down():
+                return jsonify(
+                    {"status": "error", "message": "Failed to power down device"}
+                ), 500
 
         return jsonify(
             {"status": "success", "device": device_name, "action": "down"}
         ), 200
 
     return jsonify({"status": "error", "message": "Invalid action"}), 400
+
+
+@scale_bp.route("/status", methods=["GET"])
+def status():
+    servers = ServerStateModel.query.all()
+    result = [
+        {
+            "hostname": s.hostname,
+            "status": s.status,
+            "updated_at": s.updated_at.isoformat() if s.updated_at else None,
+        }
+        for s in servers
+    ]
+    return jsonify({"status": "success", "servers": result}), 200

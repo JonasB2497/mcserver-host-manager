@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Status</title>
+    <style>
+        body { font-family: sans-serif; margin: 2rem; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 0.5rem 0.75rem; text-align: left; }
+        th { background: #f4f4f4; }
+        .online { color: green; font-weight: bold; }
+        .offline { color: gray; }
+        button { margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <h1>Server Status</h1>
+    <button id="refresh">Refresh</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Hostname</th>
+                <th>Status</th>
+                <th>Updated At</th>
+            </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+    </table>
+
+    <script>
+        async function loadStatus() {
+            try {
+                const res = await fetch("/status");
+                const data = await res.json();
+                const rows = document.getElementById("rows");
+                rows.innerHTML = "";
+                for (const s of data.servers) {
+                    const tr = document.createElement("tr");
+                    const cls = s.status === "online" ? "online" : "offline";
+                    tr.innerHTML = `
+                        <td>${s.hostname}</td>
+                        <td class="${cls}">${s.status}</td>
+                        <td>${s.updated_at ? new Date(s.updated_at).toLocaleString() : "-"}</td>
+                    `;
+                    rows.appendChild(tr);
+                }
+            } catch (err) {
+                console.error("Failed to load status:", err);
+            }
+        }
+
+        document.getElementById("refresh").addEventListener("click", loadStatus);
+        loadStatus();
+    </script>
+</body>
+</html>
