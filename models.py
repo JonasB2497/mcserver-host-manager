@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from flask_sqlalchemy import SQLAlchemy
 
@@ -12,5 +12,5 @@ class ServerStateModel(db.Model):  # type: ignore[name-defined]
     hostname = db.Column(db.String(255), unique=True, nullable=False)
     status = db.Column(db.String(32), nullable=False)
     updated_at = db.Column(
-        db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
+        db.DateTime, nullable=False, default=lambda: datetime.now(UTC)
     )

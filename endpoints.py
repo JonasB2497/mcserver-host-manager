@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from flask import Blueprint, jsonify, request
 
@@ -54,7 +54,7 @@ def scale():
 
         if target and target.status != ServerStatus.ONLINE.value:
             target.status = ServerStatus.ONLINE.value
-            target.updated_at = datetime.now(timezone.utc)
+            target.updated_at = datetime.now(UTC)
             db.session.commit()
 
         if not is_online:
@@ -86,7 +86,7 @@ def scale():
 
         if target and target.status != ServerStatus.OFFLINE.value:
             target.status = ServerStatus.OFFLINE.value
-            target.updated_at = datetime.now(timezone.utc)
+            target.updated_at = datetime.now(UTC)
             db.session.commit()
 
         if was_last_online:
