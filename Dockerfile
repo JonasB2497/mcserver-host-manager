@@ -18,6 +18,6 @@ VOLUME /data
 ENV CONFIG_PATH=/data/config.yaml
 ENV DATABASE_PATH=/data/server_states.db
 
-EXPOSE 5000
+EXPOSE 80
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:80", "app:app"]
