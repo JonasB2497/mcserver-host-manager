@@ -30,40 +30,12 @@ devices:
 
 ### 2. Home Assistant Setup
 
-If using Home Assistant, you can use the provided `homeassistant_blueprint.yaml` to quickly set up the receiving webhook. Import the blueprint into your Home Assistant instance, provide a unique webhook ID (used in `config.yaml`), and select the switch entity that controls your server's power.
+If using Home Assistant, you can use the provided `setup/homeassistant_blueprint.yaml` to quickly set up the receiving webhook. Import the blueprint into your Home Assistant instance, provide a unique webhook ID (used in `config.yaml`), and select the switch entity that controls your server's power.
 
 ### 3. Running with Docker
 
-Build and run the container:
-
-```bash
-docker build -t mc-server-starter .
-docker run -d \
-  -p 5000:5000 \
-  -v $(pwd)/config.yaml:/data/config.yaml \
-  -v $(pwd)/state.yaml:/data/state.yaml \
-  mc-server-starter
-```
-
-## Integration with mc-router
-
-To use this with `mc-router`, configure the router's webhook settings to target the `/scale` endpoint of this server.
-
-**Request Format:**
-- **Method**: `POST`
-- **URL**: `http://<starter-ip>:5000/scale`
-- **Body (JSON)**:
-  ```json
-  {
-    "action": "up", 
-    "serverAddress": "survival.example.com",
-    "backend": "10.0.0.5:25565"
-  }
-  ```
-
-**Logic:**
-- `action: "up"`: If no servers on the host are currently online, the starter triggers the device's "up" mechanism (e.g., Home Assistant webhook).
-- `action: "down"`: If the requested server is the last one online on the host, the starter triggers the device's "down" mechanism.
+In the `setup/` folder there are two docker compose files. One for the router and the other one for the actual server.
+Copy them to your servers and modify to your liking (the `docker-compose-server.yml` is basically just a standard `itzg/minecraft-server`)
 
 ## Contributing
 

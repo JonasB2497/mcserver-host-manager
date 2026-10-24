@@ -23,14 +23,14 @@ action:
   - choose:
       - conditions:
           - condition: template
-            value_template: "{{ trigger.json.status == 'on' }}"
+            value_template: "{{ trigger.json.state == 'on' }}"
         sequence:
           - service: switch.turn_on
             target:
               entity_id: !input target_switch
       - conditions:
           - condition: template
-            value_template: "{{ trigger.json.status == 'off' }}"
+            value_template: "{{ trigger.json.state == 'off' }}"
         sequence:
           - service: switch.turn_off
             target:

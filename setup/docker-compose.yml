@@ -1,0 +1,22 @@
+services:
+  host-manager:
+    image: ghcr.io/jonasb2497/mcserver-host-manager:latest
+    ports:
+      - "25564:80" # optional, for the frontend
+    volumes:
+      - ./config.yaml:/data/config.yaml
+  router:
+    image: itzg/mc-router
+    environment:
+      # add your server(s) here.
+      # Replace router-host with your hostname/domain reachable from the outside. You would enter this in minecraft
+      # Replace external-server with your actual minecraft server host. Needs to be reachable from the host you deploy this compose file on.
+      MAPPING: |
+        router-host=external-server:25565
+      AUTO_SCALE_ASLEEP_MOTD: "Server asleep. Connect to start it"
+      AUTO_SCALE_LOADING_MOTD: "Server loading. Please wait"
+      AUTO_SCALE_WEBHOOK_URL: "http://host-manager/scale"
+      AUTO_SCALE_WEBHOOK_WAKE_TIMEOUT: "5m0s" # set this to the time your server needs to start (it's better to have it set higher than needed in case you are unsure)
+      AUTO_SCALE_DOWN_AFTER: "10m"
+    ports:
+      - "25565:25565"
